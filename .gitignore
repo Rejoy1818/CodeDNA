@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+.env
+*.pkl
+*.db
+*.sqlite
+*.sqlite3
+instance/
+.webassets-cache
+
+# Models (pickle files - do not commit trained models)
+models/
+backend/models/*.pkl
+backend/models/*.joblib
+
+# Node
+node_modules/
+dist/
+**/.angular/cache/
+backend/C*UsersRejoy*
+*.lock
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Flask
+.webassets-cache
+.flaskenv
+web.config
+
+# Sample data
+backend/sample_training_data.json
