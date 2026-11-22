@@ -8,9 +8,11 @@ import { NavbarComponent } from './components/navbar/navbar.component';
   imports: [RouterOutlet, NavbarComponent],
   template: `
     <app-navbar></app-navbar>
-    <div class="container mt-4">
-      <router-outlet></router-outlet>
-    </div>
+    <main class="cn-page">
+      <div class="cn-container">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
   `,
 })
 export class AppComponent {

@@ -8,32 +8,32 @@ import { ApiService } from '../../services/api.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="card">
-      <div class="card-body">
-        <h2 class="card-title mb-4">Collect Repository Data</h2>
+    <div class="cn-card">
+      <div class="cn-section">
+        <h2 class="cn-section-title">Collect Repository Data</h2>
         <form (ngSubmit)="onSubmit()" #form="ngForm">
-          <div class="mb-3">
-            <label class="form-label">Repository Owner</label>
-            <input type="text" class="form-control" name="owner" [(ngModel)]="model.owner" required />
+          <div class="cn-form-group">
+            <label class="cn-form-label">Repository Owner</label>
+            <input type="text" class="cn-input" name="owner" [(ngModel)]="model.owner" required />
           </div>
-          <div class="mb-3">
-            <label class="form-label">Repository Name</label>
-            <input type="text" class="form-control" name="repo" [(ngModel)]="model.repo" required />
+          <div class="cn-form-group">
+            <label class="cn-form-label">Repository Name</label>
+            <input type="text" class="cn-input" name="repo" [(ngModel)]="model.repo" required />
           </div>
-          <div class="mb-3">
-            <label class="form-label">Max Commits</label>
-            <input type="number" class="form-control" name="max_commits" [(ngModel)]="model.max_commits" value="500" />
+          <div class="cn-form-group">
+            <label class="cn-form-label">Max Commits</label>
+            <input type="number" class="cn-input" name="max_commits" [(ngModel)]="model.max_commits" value="500" />
           </div>
-          <button type="submit" class="btn btn-primary" [disabled]="loading">Collect Data</button>
+          <button type="submit" class="cn-btn cn-btn-accent" [disabled]="loading">Collect Data</button>
         </form>
 
-        <div *ngIf="result" class="mt-4 alert alert-success">
+        <div *ngIf="result" class="cn-state-box cn-state-success">
           <h5>Collection Complete</h5>
           <p><strong>{{ result.repository.owner }}/{{ result.repository.name }}</strong></p>
           <p>Commits collected: {{ result.commit_count }}</p>
         </div>
 
-        <div *ngIf="error" class="mt-4 alert alert-danger">{{ error }}</div>
+        <div *ngIf="error" class="cn-state-box cn-state-error">{{ error }}</div>
       </div>
     </div>
   `,

@@ -12,127 +12,98 @@ Chart.register(...registerables);
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="dashboard">
-      <h2 class="mb-4">Developer Behaviour Dashboard</h2>
+    <div class="cn-page-header">
+      <h1 class="cn-page-title">Developer Behaviour Dashboard</h1>
+      <p class="cn-page-subtitle">Analyze repository activity and developer patterns</p>
+    </div>
 
-      <!-- Repo Selector -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title">Select Repository</h5>
-          <select class="form-select" [(ngModel)]="selectedRepoId" (change)="loadDashboard()">
-            <option *ngFor="let repo of repositories" [value]="repo.id">{{ repo.owner }}/{{ repo.name }}</option>
-          </select>
+    <!-- Repo Selector -->
+    <div class="cn-card">
+      <div class="cn-form-group">
+        <label class="cn-form-label">Select Repository</label>
+        <select class="cn-input cn-select" [(ngModel)]="selectedRepoId" (change)="loadDashboard()">
+          <option *ngFor="let repo of repositories" [value]="repo.id">{{ repo.owner }}/{{ repo.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="cn-state-info">
+      <h5>Loading</h5>
+      <p>Fetching repository data...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="cn-state-error">
+      <h5>Error</h5>
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div *ngIf="data" class="cn-dashboard-grid">
+      <!-- Repo Info -->
+      <div class="cn-card cn-card-borderless">
+        <h2 class="cn-h3">{{ data.repository.owner }}/{{ data.repository.name }}</h2>
+        <p class="cn-text-lg">{{ data.repository.description || 'No description' }}</p>
+        <p><span class="cn-chip cn-chip-brand">{{ data.repository.language || 'N/A' }}</span></p>
+      </div>
+
+      <!-- Features Stat Tiles -->
+      <div class="cn-stat-grid">
+        <div class="cn-stat-tile accent-brand">
+          <div class="cn-stat-value">{{ data.features.commits_per_day }}</div>
+          <div class="cn-stat-label">Commits / Day</div>
+        </div>
+        <div class="cn-stat-tile accent-accent">
+          <div class="cn-stat-value">{{ data.features.active_days }}</div>
+          <div class="cn-stat-label">Active Days</div>
+        </div>
+        <div class="cn-stat-tile accent-success">
+          <div class="cn-stat-value">{{ data.features.weekend_activity }}</div>
+          <div class="cn-stat-label">Weekend Commits</div>
+        </div>
+        <div class="cn-stat-tile accent-warning">
+          <div class="cn-stat-value">{{ data.features.code_change_volume }}</div>
+          <div class="cn-stat-label">Code Changes</div>
         </div>
       </div>
 
-      <!-- Loading -->
-      <div *ngIf="loading" class="text-center py-4">
-        <div class="spinner-border"></div> Loading...
+      <!-- Productivity Indicators -->
+      <div class="cn-card cn-card-borderless">
+        <h2 class="cn-h4">Productivity Indicators</h2>
+        <ul class="cn-metric-list">
+          <li class="cn-metric-item">
+            <span class="cn-metric-label">Commits / Day</span>
+            <span class="cn-chip cn-chip-brand">{{ data.productivity.indicators.commits_per_day }}</span>
+          </li>
+          <li class="cn-metric-item">
+            <span class="cn-metric-label">Active Day Ratio</span>
+            <span class="cn-chip cn-chip-brand">{{ (data.productivity.indicators.active_day_ratio * 100).toFixed(1) }}%</span>
+          </li>
+          <li class="cn-metric-item">
+            <span class="cn-metric-label">Consistency Score</span>
+            <span class="cn-chip cn-chip-success">{{ (data.productivity.indicators.consistency_score * 100).toFixed(1) }}%</span>
+          </li>
+          <li class="cn-metric-item">
+            <span class="cn-metric-label">Avg Changes / Commit</span>
+            <span class="cn-chip cn-chip-info">{{ data.productivity.indicators.avg_code_changes_per_commit }}</span>
+          </li>
+        </ul>
       </div>
 
-      <!-- Error -->
-      <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-
-      <!-- Dashboard Content -->
-      <div *ngIf="data" class="row">
-        <!-- Repo Info -->
-        <div class="col-md-6">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h5 class="card-title">{{ data.repository.owner }}/{{ data.repository.name }}</h5>
-              <p class="card-text">{{ data.repository.description || 'No description' }}</p>
-              <small class="text-muted">Language: {{ data.repository.language || 'N/A' }}</small>
-            </div>
-          </div>
+      <!-- Timeline Chart -->
+      <div class="cn-chart-card">
+        <h2 class="cn-h4">Commit Timeline</h2>
+        <div class="cn-chart-container">
+          <canvas #timelineCanvas></canvas>
         </div>
+      </div>
 
-        <!-- Features Cards -->
-        <div class="col-md-6">
-          <div class="row">
-            <div class="col-6">
-              <div class="card stat-card mb-3">
-                <div class="card-body">
-                  <div class="stat-value">{{ data.features.commits_per_day }}</div>
-                  <div class="stat-label">Commits / Day</div>
-                </div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="card stat-card mb-3">
-                <div class="card-body">
-                  <div class="stat-value">{{ data.features.active_days }}</div>
-                  <div class="stat-label">Active Days</div>
-                </div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="card stat-card mb-3">
-                <div class="card-body">
-                  <div class="stat-value">{{ data.features.weekend_activity }}</div>
-                  <div class="stat-label">Weekend Commits</div>
-                </div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="card stat-card mb-3">
-                <div class="card-body">
-                  <div class="stat-value">{{ data.features.code_change_volume }}</div>
-                  <div class="stat-label">Code Changes</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Productivity Indicators -->
-        <div class="col-md-6">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h5 class="card-title">Productivity Indicators</h5>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between">
-                  <span>Commits / Day</span>
-                  <span class="badge bg-primary">{{ data.productivity.indicators.commits_per_day }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <span>Active Day Ratio</span>
-                  <span class="badge bg-info">{{ (data.productivity.indicators.active_day_ratio * 100).toFixed(1) }}%</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <span>Consistency Score</span>
-                  <span class="badge bg-warning">{{ (data.productivity.indicators.consistency_score * 100).toFixed(1) }}%</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between">
-                  <span>Avg Changes / Commit</span>
-                  <span class="badge bg-secondary">{{ data.productivity.indicators.avg_code_changes_per_commit }}</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Timeline Chart -->
-        <div class="col-md-6">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h5 class="card-title">Commit Timeline</h5>
-              <div class="chart-container">
-                <canvas #timelineCanvas></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Time of Day Chart -->
-        <div class="col-md-6">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h5 class="card-title">Time of Day Distribution</h5>
-              <div class="chart-container">
-                <canvas #todCanvas></canvas>
-              </div>
-            </div>
-          </div>
+      <!-- Time of Day Chart -->
+      <div class="cn-chart-card">
+        <h2 class="cn-h4">Time of Day Distribution</h2>
+        <div class="cn-chart-container">
+          <canvas #todCanvas></canvas>
         </div>
       </div>
     </div>
@@ -214,8 +185,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             datasets: [{
               label: 'Commits per Day',
               data: timelineData.map(([, c]) => c),
-              borderColor: '#667eea',
-              backgroundColor: 'rgba(102, 126, 234, 0.2)',
+              borderColor: '#1e3a8a',
+              backgroundColor: 'rgba(30, 58, 138, 0.2)',
               tension: 0.4,
               fill: true,
             }],
@@ -240,7 +211,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             datasets: [{
               label: 'Commits by Hour',
               data: values,
-              backgroundColor: '#764ba2',
+              backgroundColor: '#0f766e',
             }],
           },
           options: {
